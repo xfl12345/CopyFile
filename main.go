@@ -127,10 +127,10 @@ func main() {
 	if originConfigFilePath == "" {
 		if len(noFlagArgs) > 0 {
 			originConfigFilePath = noFlagArgs[0]
-			runInConsole = false
 		} else {
 			originConfigFilePath = "./copy-file.yml"
 		}
+		runInConsole = false
 	}
 
 	configFileInfo, err := os.Stat(originConfigFilePath)
