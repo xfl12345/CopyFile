@@ -5,5 +5,5 @@ copy-file:
     destination: "R:/bigtmp/"
   - source: "./ttt/ttt2/bbb.txt"
     destination: "R:/bigtmp/ccc.txt"
-  - source: "${HOMEPATH}/.npmrc"
+  - source: "${USERPROFILE}/.npmrc"
     destination: "R:/bigtmp/"
