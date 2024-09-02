@@ -9,6 +9,8 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
+	"time"
 )
 
 type CopyFileConfig struct {
@@ -110,13 +112,32 @@ func CopyDir(src string, dst string) error {
 }
 
 func main() {
+	runInConsole := true
 	//定义命令行参数方式1
 	var originConfigFilePath string
 	//flag.StringVar(&originConfigFilePath, "config", "./copy-file.yml", "The configuration file path.")
 	//flag.StringVar(&originConfigFilePath, "c", "./copy-file.yml", "The configuration file path. (same as --config)")
-	flag.StringVar(&originConfigFilePath, "c", "./copy-file.yml", "The configuration file path.")
+	flag.StringVar(&originConfigFilePath, "c", "", "The configuration file path.")
 	//解析命令行参数
 	flag.Parse()
+
+	noFlagArgs := flag.Args()
+
+	if originConfigFilePath == "" {
+		if len(noFlagArgs) > 0 {
+			originConfigFilePath = noFlagArgs[0]
+			runInConsole = false
+		} else {
+			log.Fatal("You must specify a configuration file path.")
+		}
+	}
+
+	configFileInfo, err := os.Stat(originConfigFilePath)
+	if os.IsNotExist(err) {
+		log.Fatal("The configuration file does not exist.")
+	} else if configFileInfo.IsDir() {
+		log.Fatal("The configuration file can not be a directory!")
+	}
 
 	//fmt.Println("Hello, world!")
 	//// 获取单个环境变量
@@ -195,6 +216,14 @@ func main() {
 		}
 	}
 
-	//time.Sleep(time.Second * 1)
 	log.Println("All done!")
+	if !runInConsole {
+		countDown := 5
+		log.Println("The program will exit in " + strconv.Itoa(countDown) + " seconds. You have enough time to take screenshots of the console output.")
+		for i := 0; i < countDown; i++ {
+			fmt.Print(strconv.Itoa(countDown-i) + "...")
+			time.Sleep(time.Second)
+		}
+		fmt.Println("Exit.")
+	}
 }
