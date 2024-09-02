@@ -41,6 +41,12 @@ func CopyFile(src, dst string) error {
 		}
 	}(sourceFile)
 
+	// 获取源文件的状态以获取修改时间等信息
+	sourceFileStat, err := sourceFile.Stat()
+	if err != nil {
+		return fmt.Errorf("could not read source file stat: %w", err)
+	}
+
 	// 创建目标文件
 	destinationFile, err := os.Create(dst)
 	if err != nil {
@@ -57,6 +63,13 @@ func CopyFile(src, dst string) error {
 	_, err = io.Copy(destinationFile, sourceFile)
 	if err != nil {
 		return fmt.Errorf("could not copy file: %w", err)
+	}
+
+	// 设置目标文件的修改时间为源文件的修改时间
+	err = os.Chtimes(destinationFile.Name(), sourceFileStat.ModTime(), sourceFileStat.ModTime())
+	if err != nil {
+		log.Printf("could not set destination file modification time: %w", err)
+		return fmt.Errorf("could not set destination file modification time: %w", err)
 	}
 
 	// 确保写入磁盘
