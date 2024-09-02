@@ -154,7 +154,7 @@ func main() {
 		log.Fatal("The configuration file can not be a directory!")
 	}
 
-	if runInConsole {
+	if !runInConsole {
 		originConfigFileParentDir := filepath.Dir(originConfigFilePath)
 		err = os.Chdir(originConfigFileParentDir)
 		HandleError(err)
