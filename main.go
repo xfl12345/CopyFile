@@ -69,7 +69,7 @@ func CopyFile(src, dst string) error {
 }
 
 // CopyDir 递归复制目录
-func CopyDir(src string, dst string) error {
+func CopyDir(src, dst string) error {
 	var err error
 	var fds []os.DirEntry
 
@@ -111,6 +111,18 @@ func CopyDir(src string, dst string) error {
 	return nil
 }
 
+func PathResolve(thePath string) string {
+	theExpandedPath := os.Expand(thePath, func(s string) string {
+		return os.Getenv(s)
+	})
+	result, err := filepath.Abs(theExpandedPath)
+	if err != nil {
+		HandleError(err)
+	}
+
+	return result
+}
+
 func main() {
 	theDefaultConfigFilePath := "./copy-file.yml"
 	runInConsole := true
@@ -133,6 +145,7 @@ func main() {
 		runInConsole = false
 	}
 
+	originConfigFilePath = PathResolve(originConfigFilePath)
 	configFileInfo, err := os.Stat(originConfigFilePath)
 	if os.IsNotExist(err) {
 		log.Fatal("The configuration file does not exist.")
@@ -174,17 +187,9 @@ func main() {
 	theTaskList := rootConf.CopyFile
 	for i := 0; i < len(theTaskList); i++ {
 		theRawSrc := theTaskList[i].Src
-		theExpandedSrc := os.Expand(theRawSrc, func(s string) string {
-			return os.Getenv(s)
-		})
-		src, err := filepath.Abs(theExpandedSrc)
-		HandleError(err)
+		src := PathResolve(theRawSrc)
 		theRawDest := theTaskList[i].Dest
-		theExpandedDest := os.Expand(theRawDest, func(s string) string {
-			return os.Getenv(s)
-		})
-		dest, err := filepath.Abs(theExpandedDest)
-		HandleError(err)
+		dest := PathResolve(theRawDest)
 		log.Printf("Task %d: Copy file from [%s] to [%s].\n", i+1, src, dest)
 		srcInfo, err := os.Stat(src)
 		if os.IsNotExist(err) {
@@ -198,10 +203,8 @@ func main() {
 			if os.IsNotExist(err) {
 				err = os.MkdirAll(dest, 0755)
 				HandleError(err)
-			} else {
-				if !destInfo.IsDir() {
-					log.Fatal("Destination exists but is not a directory")
-				}
+			} else if !destInfo.IsDir() {
+				log.Fatal("Destination exists but it is not a directory")
 			}
 
 			err = CopyDir(src, dest)
