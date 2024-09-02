@@ -154,6 +154,12 @@ func main() {
 		log.Fatal("The configuration file can not be a directory!")
 	}
 
+	if runInConsole {
+		originConfigFileParentDir := filepath.Dir(originConfigFilePath)
+		err = os.Chdir(originConfigFileParentDir)
+		HandleError(err)
+	}
+
 	//fmt.Println("Hello, world!")
 	//// 获取单个环境变量
 	//value := os.Getenv("PATH") // "PATH"为环境变量名称
