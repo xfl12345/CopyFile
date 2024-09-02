@@ -142,6 +142,7 @@ func main() {
 		} else {
 			originConfigFilePath = "./copy-file.yml"
 		}
+
 		runInConsole = false
 	}
 
