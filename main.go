@@ -112,12 +112,13 @@ func CopyDir(src string, dst string) error {
 }
 
 func main() {
+	theDefaultConfigFilePath := "./copy-file.yml"
 	runInConsole := true
 	//定义命令行参数方式1
 	var originConfigFilePath string
 	//flag.StringVar(&originConfigFilePath, "config", "./copy-file.yml", "The configuration file path.")
 	//flag.StringVar(&originConfigFilePath, "c", "./copy-file.yml", "The configuration file path. (same as --config)")
-	flag.StringVar(&originConfigFilePath, "c", "", "The configuration file path.")
+	flag.StringVar(&originConfigFilePath, "c", "", "The configuration file path. Default to ["+theDefaultConfigFilePath+"].")
 	//解析命令行参数
 	flag.Parse()
 
@@ -128,7 +129,7 @@ func main() {
 			originConfigFilePath = noFlagArgs[0]
 			runInConsole = false
 		} else {
-			log.Fatal("You must specify a configuration file path.")
+			originConfigFilePath = "./copy-file.yml"
 		}
 	}
 
